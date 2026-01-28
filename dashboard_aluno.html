@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Aluno - SENAI</title>
+    <style>
+        :root { --senai-blue: #005DA5; --senai-orange: #FF8C00; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; }
+        .container { background: white; max-width: 600px; margin: auto; border-radius: 10px; border-top: 8px solid var(--senai-blue); overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .tabs { display: flex; background: #eee; }
+        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-weight: bold; color: var(--senai-blue); }
+        .tab-btn.active { background: white; color: var(--senai-orange); border-bottom: 3px solid var(--senai-orange); }
+        .content { padding: 30px; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        .btn-submit { width: 100%; background: var(--senai-orange); color: white; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        label { font-weight: bold; font-size: 14px; color: #444; }
+        #success-msg { display: none; text-align: center; padding: 40px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="main-content">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'falta')">Justificar Falta</button>
+            <button class="tab-btn" onclick="openTab(event, 'saida')">Saída Antecipada</button>
+        </div>
+        <div class="content">
+            <div id="falta" class="form-section active">
+                <h2>Justificar Falta</h2>
+                <form onsubmit="enviarSolicitacao(event, 'Justificativa')">
+                    <input type="text" id="f-nome" placeholder="Nome Completo" required>
+                    <input type="text" id="f-ra" placeholder="RA (Até 10 dígitos)" maxlength="10" required>
+                    <input type="text" id="f-curso" placeholder="Curso" required>
+                    <input type="text" id="f-instrutor" placeholder="Nome do Instrutor" required>
+                    <label>Anexar Atestado:</label>
+                    <input type="file" required accept="image/*,.pdf">
+                    <button type="submit" class="btn-submit">GERAR PROTOCOLO</button>
+                </form>
+            </div>
+
+            <div id="saida" class="form-section">
+                <h2>Saída Antecipada</h2>
+                <form onsubmit="enviarSolicitacao(event, 'Saída')">
+                    <input type="text" id="s-nome" placeholder="Nome Completo" required>
+                    <input type="text" id="s-ra" placeholder="RA (Até 10 dígitos)" maxlength="10" required>
+                    <input type="text" id="s-curso" placeholder="Curso" required>
+                    <input type="text" id="s-instrutor" placeholder="Instrutor da Aula Atual" required>
+                    <label>Horário da Saída:</label>
+                    <input type="time" id="s-hora" required>
+                    <textarea id="s-motivo" placeholder="Motivo da Saída Antecipada" rows="3"></textarea>
+                    <button type="submit" class="btn-submit" style="background: var(--senai-blue);">SOLICITAR SAÍDA</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-msg">
+        <h1 style="color: #28a745;">✓</h1>
+        <h2>Solicitação Enviada!</h2>
+        <p id="protocolo-texto"></p>
+        <button onclick="location.reload()" class="btn-submit" style="background: #666; width: auto; padding: 10px 20px;">Fazer outro envio</button>
+    </div>
+</div>
+
+<script>
+    function openTab(evt, name) {
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+        document.getElementById(name).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+
+    function enviarSolicitacao(event, tipo) {
+        event.preventDefault();
+        const protocolo = "SN-" + Math.floor(100000 + Math.random() * 900000);
+        const prefixo = tipo === 'Justificativa' ? 'f' : 's';
+        
+        const dados = {
+            id: protocolo,
+            tipo: tipo,
+            nome: document.getElementById(`${prefixo}-nome`).value,
+            ra: document.getElementById(`${prefixo}-ra`).value,
+            curso: document.getElementById(`${prefixo}-curso`).value,
+            instrutor: document.getElementById(`${prefixo}-instrutor`).value,
+            status: 'Pendente'
+        };
+
+        let lista = JSON.parse(localStorage.getItem('solicitacoes') || '[]');
+        lista.push(dados);
+        localStorage.setItem('solicitacoes', JSON.stringify(lista));
+
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('success-msg').style.display = 'block';
+        document.getElementById('protocolo-texto').innerHTML = `Protocolo Gerado: <strong>${protocolo}</strong>`;
+    }
+</script>
+</body>
+</html>

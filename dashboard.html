@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGA - Sistema de Gestão de Alunos SENAI</title>
+    <style>
+        :root {
+            --senai-blue: #005DA5;
+            --senai-orange: #FF8C00;
+            --bg-gray: #f0f2f5;
+            --success: #28a745;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-gray); margin: 0; padding: 20px; }
+        .container { background: white; width: 100%; max-width: 900px; margin: auto; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); overflow: hidden; border-top: 8px solid var(--senai-blue); }
+
+        /* Navegação */
+        .tabs { display: flex; background: #eee; border-bottom: 2px solid #ddd; }
+        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-weight: bold; color: var(--senai-blue); background: #e0e0e0; transition: 0.3s; }
+        .tab-btn.active { background: white; color: var(--senai-orange); border-bottom: 4px solid var(--senai-orange); }
+
+        .content { padding: 30px; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+
+        /* Estilo dos Formulários */
+        h2 { color: var(--senai-blue); margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .full { grid-column: span 2; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; font-size: 13px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        input:focus { border-color: var(--senai-orange); outline: none; }
+
+        .btn-submit { width: 100%; background: var(--senai-orange); color: white; padding: 15px; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-submit:hover { opacity: 0.9; }
+
+        /* Tabela da Secretaria */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: var(--senai-blue); color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .status { padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-pendente { background: #ffeeba; color: #856404; }
+
+        #success-msg { display: none; text-align: center; padding: 40px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'falta')">Justificar Falta</button>
+        <button class="tab-btn" onclick="openTab(event, 'saida')">Saída Antecipada</button>
+        <button class="tab-btn" onclick="openTab(event, 'secretaria'); carregarTabela();" style="background: #333; color: #fff;">Área Secretaria</button>
+    </div>
+
+    <div class="content" id="main-content">
+        
+        <div id="falta" class="form-section active">
+            <h2>Justificar Falta</h2>
+            <form id="formFalta" onsubmit="salvarDados(event, 'Justificativa')">
+                <div class="form-grid">
+                    <div class="full"><label>Nome do Aluno</label><input type="text" id="f-nome" required></div>
+                    <div><label>RA (Até 10 dígitos)</label><input type="text" id="f-ra" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'');" required></div>
+                    <div><label>Curso</label><input type="text" id="f-curso" required></div>
+                    <div><label>Instrutor</label><input type="text" id="f-instrutor" required></div>
+                    <div><label>Atestado (PDF/IMG)</label><input type="file" id="f-arquivo" required></div>
+                </div>
+                <button type="submit" class="btn-submit">ENVIAR PROTOCOLO</button>
+            </form>
+        </div>
+
+        <div id="saida" class="form-section">
+            <h2>Liberação de Saída</h2>
+            <form id="formSaida" onsubmit="salvarDados(event, 'Saída')">
+                <div class="form-grid">
+                    <div class="full"><label>Nome do Aluno</label><input type="text" id="s-nome" required></div>
+                    <div><label>RA (Até 10 dígitos)</label><input type="text" id="s-ra" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'');" required></div>
+                    <div><label>Curso</label><input type="text" id="s-curso" required></div>
+                    <div><label>Horário</label><input type="time" id="s-hora" required></div>
+                    <div class="full"><label>Instrutor da Aula</label><input type="text" id="s-instrutor" required></div>
+                    <div class="full"><label>Motivo</label><textarea id="s-motivo" rows="2"></textarea></div>
+                </div>
+                <button type="submit" class="btn-submit" style="background: var(--senai-blue);">SOLICITAR SAÍDA</button>
+            </form>
+        </div>
+
+        <div id="secretaria" class="form-section">
+            <h2>Solicitações Recebidas <button onclick="limparDados()" style="font-size: 10px; cursor:pointer;">Limpar Tudo</button></h2>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Protocolo</th>
+                            <th>Tipo</th>
+                            <th>Aluno (RA)</th>
+                            <th>Curso</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-corpo"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="success-msg">
+        <h1 style="color: var(--success);">✓</h1>
+        <h2 style="justify-content: center;">Protocolo Gerado!</h2>
+        <p id="detalhe-protocolo"></p>
+        <button onclick="location.reload()" class="btn-submit" style="background: #666; width: auto; padding: 10px 20px;">Novo Envio</button>
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        let sections = document.getElementsByClassName("form-section");
+        for (let s of sections) s.classList.remove("active");
+        let tabs = document.getElementsByClassName("tab-btn");
+        for (let t of tabs) t.classList.remove("active");
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    function salvarDados(event, tipo) {
+        event.preventDefault();
+        
+        const protocolo = "SENAI-" + Math.floor(100000 + Math.random() * 900000);
+        const prefixo = tipo === 'Justificativa' ? 'f' : 's';
+        
+        const novaSolicitacao = {
+            id: protocolo,
+            tipo: tipo,
+            nome: document.getElementById(`${prefixo}-nome`).value,
+            ra: document.getElementById(`${prefixo}-ra`).value,
+            curso: document.getElementById(`${prefixo}-curso`).value,
+            status: 'Pendente'
+        };
+
+        // Salvar no LocalStorage (Banco de dados do navegador)
+        let lista = JSON.parse(localStorage.getItem('solicitacoes') || '[]');
+        lista.push(novaSolicitacao);
+        localStorage.setItem('solicitacoes', JSON.stringify(lista));
+
+        // Mostrar Sucesso
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('success-msg').style.display = 'block';
+        document.getElementById('detalhe-protocolo').innerHTML = `Protocolo: <strong>${protocolo}</strong><br>Aluno: ${novaSolicitacao.nome} (RA: ${novaSolicitacao.ra})`;
+    }
+
+    function carregarTabela() {
+        const lista = JSON.parse(localStorage.getItem('solicitacoes') || '[]');
+        const corpo = document.getElementById('tabela-corpo');
+        corpo.innerHTML = "";
+
+        lista.reverse().forEach(item => {
+            corpo.innerHTML += `
+                <tr>
+                    <td><strong>#${item.id}</strong></td>
+                    <td>${item.tipo}</td>
+                    <td>${item.nome} (${item.ra})</td>
+                    <td>${item.curso}</td>
+                    <td><span class="status status-pendente">${item.status}</span></td>
+                </tr>
+            `;
+        });
+        if(lista.length === 0) corpo.innerHTML = "<tr><td colspan='5' style='text-align:center'>Nenhum registro encontrado.</td></tr>";
+    }
+
+    function limparDados() {
+        if(confirm("Deseja apagar todo o histórico da secretaria?")) {
+            localStorage.removeItem('solicitacoes');
+            carregarTabela();
+        }
+    }
+    // Função para simular dados se o banco estiver vazio
+    function simularDadosIniciais() {
+        let lista = JSON.parse(localStorage.getItem('solicitacoes') || '[]');
+        if (lista.length === 0) {
+            const simulados = [
+                {id: "SN-102938", tipo: "Justificativa", nome: "Ana Costa", ra: "1234567890", curso: "Mecânica", status: "Pendente"},
+                {id: "SN-445566", tipo: "Saída", nome: "Bruno Silva", ra: "0987654321", curso: "Informática", status: "Pendente"},
+                {id: "SN-998877", tipo: "Justificativa", nome: "Carla Dias", ra: "1122334455", curso: "Eletrotécnica", status: "Pendente"},
+                {id: "SN-332211", tipo: "Saída", nome: "Diego Lima", ra: "5544332211", curso: "Redes", status: "Pendente"},
+                {id: "SN-776655", tipo: "Justificativa", nome: "Elena Paz", ra: "6677889900", curso: "Logística", status: "Pendente"},
+                {id: "SN-121212", tipo: "Saída", nome: "Fabio Jr", ra: "1010102020", curso: "Design", status: "Pendente"}
+            ];
+            localStorage.setItem('solicitacoes', JSON.stringify(simulados));
+        }
+    }
+
+    // Chame a simulação ao carregar a página
+    window.onload = function() {
+        simularDadosIniciais();
+        carregarTabela();
+    };
+
+    // Mantenha as funções openTab, carregarTabela e limparDados que você já possui
+</script>
+
+</body>
+</html>

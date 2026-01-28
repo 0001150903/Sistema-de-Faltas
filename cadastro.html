@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - SGA SENAI</title>
+    <style>
+        :root { --senai-blue: #005DA5; --senai-orange: #FF8C00; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--senai-blue) 0%, #003d6e 100%);
+            height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center;
+        }
+        .card {
+            background: white; padding: 30px; border-radius: 12px;
+            width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        h2 { color: var(--senai-blue); text-align: center; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .full { grid-column: span 2; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #333; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .btn {
+            width: 100%; background: var(--senai-orange); color: white; padding: 14px;
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px;
+        }
+        .login-link { display: block; text-align: center; margin-top: 15px; font-size: 13px; color: var(--senai-blue); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Criar Conta Aluno</h2>
+    <form id="formCadastro" onsubmit="realizarCadastro(event)">
+        <div class="form-grid">
+            <div class="full">
+                <label>Nome Completo</label>
+                <input type="text" id="cad-nome" required placeholder="Ex: João Silva">
+            </div>
+            <div>
+                <label>RA (10 dígitos)</label>
+                <input type="text" id="cad-ra" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'');" required>
+            </div>
+            <div>
+                <label>Curso</label>
+                <input type="text" id="cad-curso" required placeholder="Ex: Redes">
+            </div>
+            <div class="full">
+                <label>E-mail Institucional</label>
+                <input type="email" id="cad-email" required placeholder="aluno@senai.com.br">
+            </div>
+            <div>
+                <label>Senha</label>
+                <input type="password" id="cad-senha" required placeholder="••••••••">
+            </div>
+            <div>
+                <label>Confirmar Senha</label>
+                <input type="password" id="cad-confirma" required placeholder="••••••••">
+            </div>
+        </div>
+        
+        <button type="submit" class="btn">CADASTRAR ALUNO</button>
+    </form>
+    
+    <a href="index.html" class="login-link">Já tem uma conta? Faça Login</a>
+</div>
+
+<script>
+    function realizarCadastro(event) {
+        event.preventDefault();
+        
+        const senha = document.getElementById('cad-senha').value;
+        const confirma = document.getElementById('cad-confirma').value;
+        const ra = document.getElementById('cad-ra').value;
+
+        if (ra.length < 5) {
+            alert("O RA deve ter pelo menos 5 dígitos.");
+            return;
+        }
+
+        if (senha !== confirma) {
+            alert("As senhas não coincidem!");
+            return;
+        }
+
+        // Simulação de salvamento
+        const novoUsuario = {
+            nome: document.getElementById('cad-nome').value,
+            ra: ra,
+            curso: document.getElementById('cad-curso').value,
+            email: document.getElementById('cad-email').value
+        };
+
+        console.log("Usuário Cadastrado:", novoUsuario);
+        alert("Cadastro realizado com sucesso! Use seu RA para entrar.");
+        window.location.href = "index.html";
+    }
+</script>
+
+</body>
+</html>
