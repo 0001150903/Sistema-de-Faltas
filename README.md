@@ -1,4 +1,4 @@
-# SGA - Sistema de Gestão de Alunos (SENAI)
+# Justify - Sistema de Gestão de Alunos (SENAI)
 
 Este projeto é um protótipo de sistema web desenvolvido como Trabalho de Conclusão de Curso (TCC). O objetivo é automatizar e digitalizar o processo de justificativa de faltas e solicitação de saída antecipada para alunos da instituição SENAI.
 
@@ -34,6 +34,6 @@ Como o projeto foi desenvolvido utilizando tecnologias front-end puras, não é 
 1. Faça o download dos arquivos.
 2. Abra o arquivo `index.html` em qualquer navegador moderno (Chrome, Edge ou Firefox).
 3. Para acessar a Secretaria, utilize o RA `admin` e senha `1234`.
-
+4. Para acessar a Área do aluno, utilize um RA de 10 dígitos e uma senha de 5 números.
 ---
 **Desenvolvido como requisito parcial para obtenção de título no curso do SENAI.**
