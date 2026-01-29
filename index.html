@@ -22,7 +22,7 @@
 
         .login-card {
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 12px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             width: 100%;
@@ -34,16 +34,28 @@
             font-size: 32px;
             font-weight: bold;
             color: var(--senai-blue);
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .logo-area span { color: var(--senai-orange); }
 
-        p { color: #666; margin-bottom: 30px; font-size: 14px; }
+        .subtitle { color: #666; margin-bottom: 25px; font-size: 14px; margin-top: 0; }
+
+        /* CORREÇÃO: Ocultar erro por padrão */
+        #erro {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            border: 1px solid #f5c6cb;
+        }
 
         .input-group {
             text-align: left;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         label {
@@ -51,6 +63,7 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
+            font-size: 14px;
         }
 
         input {
@@ -78,6 +91,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
+            margin-top: 10px;
         }
 
         .btn-login:hover {
@@ -89,27 +103,35 @@
             margin-top: 20px;
             font-size: 13px;
             color: #666;
-            line-height: 1.8;
         }
 
         .link-footer {
             color: var(--senai-blue);
             text-decoration: none;
             font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .link-footer:hover {
-            color: var(--senai-orange);
-            text-decoration: underline;
         }
 
         .restrito {
             display: block;
-            margin-top: 10px;
-            font-size: 11px;
+            margin-top: 15px;
+            font-size: 10px;
             color: #999;
             text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-contato {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .footer-contato a {
+            color: var(--senai-blue);
+            text-decoration: none;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -117,7 +139,7 @@
 
 <div class="login-card">
     <div class="logo-area">SENAI<span>.</span></div>
-    <p>Gestão de Faltas e Saídas</p>
+    <p class="subtitle">Gestão de Faltas e Saídas</p>
 
     <div id="erro">RA ou Senha incorretos!</div>
 
@@ -136,12 +158,17 @@
     </form>
 
     <div class="footer-links">
-        <a href="recuperar.html" class="link-footer">Esqueceu a senha?</a> 
+        <a href="#" class="link-footer">Esqueceu a senha?</a> 
         <span style="color: #ddd; margin: 0 5px;">|</span>
-        <a href="cadastro.html" class="link-footer">Criar conta</a>
-        <strong class="restrito">Acesso Restrito a Alunos e Colaboradores</strong>
-</div>
+        <a href="#" class="link-footer">Criar conta</a>
+    </div>
 
+    <div class="footer-contato">
+        Dúvidas? Contate a Secretaria: <br>
+        <a href="mailto:secretaria.senai@exemplo.com.br">secretaria.senai@exemplo.com.br</a>
+    </div>
+
+    <strong class="restrito">Acesso Restrito a Alunos e Colaboradores</strong>
 </div>
 
 <script>
@@ -149,13 +176,15 @@
         e.preventDefault();
         const ra = document.getElementById('ra').value;
         const senha = document.getElementById('senha').value;
+        const erroDiv = document.getElementById('erro');
 
+        // Lógica de Redirecionamento
         if (ra === "admin" && senha === "1234") {
-            window.location.href = "dashboard.html"; 
+            window.location.href = "dashboard.html"; // Vai para a secretaria
         } else if (ra.length >= 5 && senha.length >= 4) {
-            window.location.href = "dashboard_aluno.html";
+            window.location.href = "dashboard_aluno.html"; // Vai para o portal do aluno
         } else {
-            document.getElementById('erro').style.display = 'block';
+            erroDiv.style.display = 'block';
         }
     });
 </script>
